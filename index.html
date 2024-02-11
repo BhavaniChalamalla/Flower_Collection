@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Game Title</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('leaf2.jpg'); /* Update with your image file name */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #basket {
+            position: absolute;
+            bottom: 10px; /* Adjust the position as needed */
+            left: 50%; /* Initial position in the center */
+            transform: translateX(-50%);
+            width: 160px; /* Adjust the width as needed */
+            height: 160px; /* Adjust the height as needed */
+            background-image: url('basket.png'); /* Update with your basket image file name */
+            background-size: cover;
+        }
+
+        .flower {
+            position: absolute;
+            width: 80px; /* Adjust the width of the flower */
+            height: 80px; /* Adjust the height of the flower */
+            background-image: url('flower.png'); /* Update with your flower image file name */
+            background-size: cover;
+            border-radius: 50%;
+        }
+
+        #flowersCollected {
+            position: absolute;
+            top: 10px; /* Adjust the position as needed */
+            right: 10px; /* Adjust the position as needed */
+            font-size: 24px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div id="basket"></div>
+<div id="flowersCollected">Number of Flowers Collected: 0</div>
+
+<script>
+    // JavaScript code for handling basket movement, falling flowers, and the flowers collected count
+    var basket = document.getElementById('basket');
+    var flowersCollectedElement = document.getElementById('flowersCollected');
+    var position = 50; // Initial position in the center
+    var flowersCollected = 0;
+    var flowerInterval;
+
+    document.addEventListener('keydown', function (event) {
+        if (event.code === 'ArrowLeft' && position > 0) {
+            position -= 10; // Adjust the movement speed
+        } else if (event.code === 'ArrowRight' && position < window.innerWidth - basket.clientWidth) {
+            position += 10; // Adjust the movement speed
+        }
+
+        basket.style.left = position + 'px';
+    });
+
+    function createFlower() {
+        var flower = document.createElement('div');
+        flower.classList.add('flower');
+        flower.style.left = Math.floor(Math.random() * window.innerWidth) + 'px';
+        document.body.appendChild(flower);
+
+        var fallSpeed = 2 + Math.random() * 3; // Adjust the fall speed range
+        var topPosition = 0;
+
+        function moveFlower() {
+            if (topPosition < window.innerHeight) {
+                topPosition += fallSpeed;
+                flower.style.top = topPosition + 'px';
+
+                // Check for basket collision
+                if (isColliding(flower, basket)) {
+                    flower.remove(); // Remove flower when collected
+                    updateFlowersCollected(1); // Increase the flowers collected count by 1
+                }
+
+                requestAnimationFrame(moveFlower);
+            } else {
+                flower.remove(); // Remove flower when it reaches the bottom
+            }
+        }
+
+        moveFlower();
+    }
+
+    // Schedule the creation of flowers at intervals
+    flowerInterval = setInterval(createFlower, 2000); // Adjust the interval as needed
+
+    function updateFlowersCollected(value) {
+        flowersCollected += value;
+        flowersCollectedElement.textContent = 'Number of Flowers Collected: ' + flowersCollected;
+    }
+
+    function isColliding(element1, element2) {
+        // Check for collision between two elements
+        var rect1 = element1.getBoundingClientRect();
+        var rect2 = element2.getBoundingClientRect();
+
+        return !(rect1.right < rect2.left ||
+                 rect1.left > rect2.right ||
+                 rect1.bottom < rect2.top ||
+                 rect1.top > rect2.bottom);
+    }
+</script>
+
+</body>
+</html>
